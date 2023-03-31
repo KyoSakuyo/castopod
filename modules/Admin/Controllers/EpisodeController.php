@@ -17,12 +17,12 @@ use App\Entities\Podcast;
 use App\Entities\Post;
 use App\Models\EpisodeCommentModel;
 use App\Models\EpisodeModel;
-use App\Models\MediaModel;
 use App\Models\PodcastModel;
 use App\Models\PostModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\I18n\Time;
+use Modules\Media\Models\MediaModel;
 
 class EpisodeController extends BaseController
 {
@@ -147,7 +147,7 @@ class EpisodeController extends BaseController
             'slug' => 'max_length[128]',
             'audio_file' => 'uploaded[audio_file]|ext_in[audio_file,mp3,m4a]',
             'cover' =>
-                'is_image[cover]|ext_in[cover,jpg,png]|min_dims[cover,1400,1400]|is_image_ratio[cover,1,1]',
+                'is_image[cover]|ext_in[cover,jpg,jpeg,png]|min_dims[cover,1400,1400]|is_image_ratio[cover,1,1]',
             'transcript_file' =>
                 'ext_in[transcript,srt]|permit_empty',
             'chapters_file' => 'ext_in[chapters,json]|permit_empty',
@@ -286,7 +286,7 @@ class EpisodeController extends BaseController
             'audio_file' =>
                 'uploaded[audio_file]|ext_in[audio_file,mp3,m4a]|permit_empty',
             'cover' =>
-                'is_image[cover]|ext_in[cover,jpg,png]|min_dims[cover,1400,1400]|is_image_ratio[cover,1,1]',
+                'is_image[cover]|ext_in[cover,jpg,jpeg,png]|min_dims[cover,1400,1400]|is_image_ratio[cover,1,1]',
             'transcript_file' =>
                 'ext_in[transcript_file,txt,html,srt,json]|permit_empty',
             'chapters_file' => 'ext_in[chapters_file,json]|permit_empty',
@@ -911,9 +911,11 @@ class EpisodeController extends BaseController
             $episodeMediaList[] = $this->episode->cover;
         }
 
+        $mediaModel = new MediaModel();
+
         //delete episode media records from database
         foreach ($episodeMediaList as $episodeMedia) {
-            if ($episodeMedia !== null && ! $episodeMedia->delete()) {
+            if ($episodeMedia !== null && ! $mediaModel->delete($episodeMedia->id)) {
                 $db->transRollback();
                 return redirect()
                     ->back()
@@ -933,7 +935,7 @@ class EpisodeController extends BaseController
             if ($episodeMedia !== null && ! $episodeMedia->deleteFile()) {
                 $warnings[] = lang('Episode.messages.deleteFileError', [
                     'type' => $episodeMedia->type,
-                    'file_path' => $episodeMedia->file_path,
+                    'file_key' => $episodeMedia->file_key,
                 ]);
             }
         }

@@ -55,6 +55,7 @@ return [
         }',
         'episode' => 'Avsnitt',
         'visibility' => 'Synlighet',
+        'downloads' => 'Downloads',
         'comments' => 'Kommentarer',
         'actions' => 'Åtgärder',
     ],
@@ -85,7 +86,7 @@ return [
             image {omslag}
             audio {ljud}
             other {media}
-        } fil {file_path}. Du kan manuellt ta bort den från disken.',
+        } fil {file_key}. Du kan manuellt ta bort den från disken.',
         'sameSlugError' => 'Ett avsnitt med den valda slug finns redan.',
     ],
     'form' => [

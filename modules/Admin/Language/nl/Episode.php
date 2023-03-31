@@ -55,6 +55,7 @@ return [
         }',
         'episode' => 'Aflevering',
         'visibility' => 'Zichtbaarheid',
+        'downloads' => 'Downloads',
         'comments' => 'Reacties',
         'actions' => 'Acties',
     ],
@@ -85,7 +86,7 @@ return [
             image {cover}
             audio {audio}
             other {media}
-        } file {file_path}. You may manually remove it from your disk.',
+        } file {file_key}. You may manually remove it from your disk.',
         'sameSlugError' => 'An episode with the chosen slug already exists.',
     ],
     'form' => [

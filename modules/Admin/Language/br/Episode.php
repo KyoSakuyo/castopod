@@ -57,6 +57,7 @@ return [
     }',
         'episode' => 'Rann',
         'visibility' => 'Gwelusted',
+        'downloads' => 'Downloads',
         'comments' => 'Evezhiadennoù',
         'actions' => 'Obererezhioù',
     ],
@@ -87,7 +88,7 @@ return [
             image {ar golo}
             audio {an aodio}
             other {ar media}
-        } ({file_path}). Gallout a rit lemel kuit ar restr-mañ diouzh ar gantenn dre zorn.',
+        } ({file_key}). Gallout a rit lemel kuit ar restr-mañ diouzh ar gantenn dre zorn.',
         'sameSlugError' => 'Bez ez eus eus ur rann gant ar berradur-mañ (slug) dija.',
     ],
     'form' => [

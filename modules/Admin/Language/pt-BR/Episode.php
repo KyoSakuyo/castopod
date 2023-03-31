@@ -55,6 +55,7 @@ return [
         }',
         'episode' => 'Episódio',
         'visibility' => 'Visibilidade',
+        'downloads' => 'Downloads',
         'comments' => 'Comentários',
         'actions' => 'Ações',
     ],
@@ -85,7 +86,7 @@ return [
             image {capa}
             audio {áudio}
             other {mídia}
-        } {file_path}. Você pode removê-lo manualmente do seu disco.',
+        } {file_key}. Você pode removê-lo manualmente do seu disco.',
         'sameSlugError' => 'Um episódio com o slug escolhido já existe.',
     ],
     'form' => [

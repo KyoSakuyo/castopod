@@ -11,22 +11,15 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Models\PodcastModel;
+use CodeIgniter\Database\Exceptions\DatabaseException;
 use CodeIgniter\HTTP\RedirectResponse;
-use Config\Services;
+use CodeIgniter\HTTP\ResponseInterface;
+use Modules\Media\FileManagers\FileManagerInterface;
 
 class HomeController extends BaseController
 {
     public function index(): RedirectResponse | string
     {
-        $db = db_connect();
-        if ($db->getDatabase() === '' || ! $db->tableExists('podcasts')) {
-            // Database has not been set or could not find the podcasts table
-            // Redirecting to install page because it is likely that Castopod has not been installed yet.
-            // NB: as base_url wouldn't have been defined here, redirect to install wizard manually
-            $route = Services::routes()->reverseRoute('install');
-            return redirect()->to(rtrim(host_url(), '/') . $route);
-        }
-
         $sortOptions = ['activity', 'created_desc', 'created_asc'];
         $sortBy = in_array($this->request->getGet('sort'), $sortOptions, true) ? $this->request->getGet(
             'sort'
@@ -47,5 +40,44 @@ class HomeController extends BaseController
         ];
 
         return view('home', $data);
+    }
+
+    public function health(): ResponseInterface
+    {
+        $errors = [];
+
+        try {
+            db_connect();
+        } catch (DatabaseException) {
+            $errors[] = 'Unable to connect to the database.';
+        }
+
+        // --- Can Castopod connect to the cache handler
+        if (config('Cache')->handler !== 'dummy' && cache()->getCacheInfo() === null) {
+            $errors[] = 'Unable connect to the cache handler.';
+        }
+
+        // --- Can Castopod write to storage?
+
+        /** @var FileManagerInterface $fileManager */
+        $fileManager = service('file_manager', false);
+
+        if (! $fileManager->isHealthy()) {
+            $errors[] = 'Problem with file manager.';
+        }
+
+        if ($errors !== []) {
+            return $this->response->setStatusCode(503)
+                ->setJSON([
+                    'code' => 503,
+                    'errors' => $errors,
+                ]);
+        }
+
+        return $this->response->setStatusCode(200)
+            ->setJSON([
+                'code' => 200,
+                'message' => '✨ All good!',
+            ]);
     }
 }

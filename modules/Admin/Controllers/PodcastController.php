@@ -17,7 +17,6 @@ use App\Models\ActorModel;
 use App\Models\CategoryModel;
 use App\Models\EpisodeModel;
 use App\Models\LanguageModel;
-use App\Models\MediaModel;
 use App\Models\PodcastModel;
 use App\Models\PostModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
@@ -32,6 +31,8 @@ use Modules\Analytics\Models\AnalyticsPodcastModel;
 use Modules\Analytics\Models\AnalyticsWebsiteByBrowserModel;
 use Modules\Analytics\Models\AnalyticsWebsiteByEntryPageModel;
 use Modules\Analytics\Models\AnalyticsWebsiteByRefererModel;
+use Modules\Media\FileManagers\FileManagerInterface;
+use Modules\Media\Models\MediaModel;
 
 class PodcastController extends BaseController
 {
@@ -184,8 +185,8 @@ class PodcastController extends BaseController
     {
         $rules = [
             'cover' =>
-                'uploaded[cover]|is_image[cover]|ext_in[cover,jpg,png]|min_dims[cover,1400,1400]|is_image_ratio[cover,1,1]',
-            'banner' => 'is_image[banner]|ext_in[banner,jpg,png]|min_dims[banner,1500,500]|is_image_ratio[banner,3,1]',
+                'uploaded[cover]|is_image[cover]|ext_in[cover,jpg,jpeg,png]|min_dims[cover,1400,1400]|is_image_ratio[cover,1,1]',
+            'banner' => 'is_image[banner]|ext_in[banner,jpg,jpeg,png]|min_dims[banner,1500,500]|is_image_ratio[banner,3,1]',
         ];
 
         if (! $this->validate($rules)) {
@@ -299,8 +300,8 @@ class PodcastController extends BaseController
     {
         $rules = [
             'cover' =>
-                'is_image[cover]|ext_in[cover,jpg,png]|min_dims[cover,1400,1400]|is_image_ratio[cover,1,1]',
-            'banner' => 'is_image[banner]|ext_in[banner,jpg,png]|min_dims[banner,1500,500]|is_image_ratio[banner,3,1]',
+                'is_image[cover]|ext_in[cover,jpg,jpeg,png]|min_dims[cover,1400,1400]|is_image_ratio[cover,1,1]',
+            'banner' => 'is_image[banner]|ext_in[banner,jpg,jpeg,png]|min_dims[banner,1500,500]|is_image_ratio[banner,3,1]',
         ];
 
         if (! $this->validate($rules)) {
@@ -497,8 +498,10 @@ class PodcastController extends BaseController
                 $episodeMediaList[] = $podcastEpisode->cover;
             }
 
+            $mediaModel = new MediaModel();
+
             foreach ($episodeMediaList as $episodeMedia) {
-                if ($episodeMedia !== null && ! $episodeMedia->delete()) {
+                if ($episodeMedia !== null && ! $mediaModel->delete($episodeMedia->id)) {
                     $db->transRollback();
                     return redirect()
                         ->back()
@@ -538,8 +541,10 @@ class PodcastController extends BaseController
             ];
         }
 
+        $mediaModel = new MediaModel();
+
         foreach ($podcastMediaList as $podcastMedia) {
-            if ($podcastMedia['file'] !== null && ! $podcastMedia['file']->delete()) {
+            if ($podcastMedia['file'] !== null && ! $mediaModel->delete($podcastMedia['file']->id)) {
                 $db->transRollback();
                 return redirect()
                     ->back()
@@ -587,15 +592,12 @@ class PodcastController extends BaseController
 
         $db->transComplete();
 
+        /** @var FileManagerInterface $fileManager */
+        $fileManager = service('file_manager');
+
         //delete podcast media files and folder
         $folder = 'podcasts/' . $this->podcast->handle;
-
-        $mediaRoot = config('App')
-            ->mediaRoot . '/' . $folder;
-
-        helper('filesystem');
-
-        if (! delete_files($mediaRoot) || ! rmdir($mediaRoot)) {
+        if (! $fileManager->deleteAll($folder)) {
             return redirect()->route('podcast-list')
                 ->with('message', lang('Podcast.messages.deleteSuccess', [
                     'podcast_handle' => $this->podcast->handle,

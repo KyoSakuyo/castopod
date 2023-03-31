@@ -55,6 +55,7 @@ return [
         }',
         'episode' => '剧集',
         'visibility' => '可见性',
+        'downloads' => 'Downloads',
         'comments' => '评论',
         'actions' => '操作',
     ],
@@ -85,7 +86,7 @@ return [
             image {封面}
             audio {音频}
             other {媒体}
-        } 文件 {file_path}。您可以手动将其从磁盘删除。',
+        } 文件 {file_key}。您可以手动将其从磁盘删除。',
         'sameSlugError' => '选中的剧集已存在。',
     ],
     'form' => [

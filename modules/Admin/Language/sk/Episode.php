@@ -59,6 +59,7 @@ return [
         }',
         'episode' => 'Epizóda',
         'visibility' => 'Viditeľnosť',
+        'downloads' => 'Downloads',
         'comments' => 'Komentáre',
         'actions' => 'Úkony',
     ],
@@ -89,7 +90,7 @@ return [
             image {obrázok}
             audio {zvuk}
             other {médiá}
-        } súbor {file_path}. Môžete ho z disku odstrániť ručne.',
+        } súbor {file_key}. Môžete ho z disku odstrániť ručne.',
         'sameSlugError' => 'Epizóda s takýmto trvalým odkazom už existuje.',
     ],
     'form' => [
